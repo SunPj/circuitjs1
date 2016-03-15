@@ -31,6 +31,7 @@ import java.util.Vector;
 import java.util.Random;
 import java.lang.Math;
 import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -73,12 +74,17 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.PopupPanel;
 import static com.google.gwt.event.dom.client.KeyCodes.*;
+import static com.lushprojects.circuitjs1.client.api.ActionType.*;
+import static com.lushprojects.circuitjs1.client.api.ActionType.EXPORT_AS_TEXT;
+import static com.lushprojects.circuitjs1.client.api.ActionType.SET_DISPLAY_VISIBILITY;
+
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.Window.Navigator;
-
+import com.lushprojects.circuitjs1.client.api.ApiAction;
+import com.lushprojects.circuitjs1.client.api.ApiProvider;
 
 public class CirSim implements MouseDownHandler, MouseMoveHandler, MouseUpHandler,
 ClickHandler, DoubleClickHandler, ContextMenuHandler, NativePreviewHandler,
@@ -308,6 +314,7 @@ MouseOutHandler, MouseWheelHandler {
 //    String baseURL = "http://www.falstad.com/circuit/";
     
     public void init() {
+		initializeApi();
 
 //	String euroResistor = null;
 //	String useFrameStr = null;
@@ -710,7 +717,38 @@ MouseOutHandler, MouseWheelHandler {
 
     }
 
-    boolean shown = false;
+	private void initializeApi() {
+		final ApiProvider apiProvider = new ApiProvider();
+
+		apiProvider.addAction(EXPORT_AS_TEXT, new ApiAction() {
+			@Override
+			public Object apply(JSONObject args) {
+				return dumpCircuit();
+			}
+		});
+
+		apiProvider.addAction(IMPOORT_AS_TEXT, new ApiAction() {
+			@Override
+			public Object apply(JSONObject args) {
+				String textData = args.get("text").isString().stringValue();
+				readSetup(textData, true);
+
+				return null;
+			}
+		});
+
+		apiProvider.addAction(SET_DISPLAY_VISIBILITY, new ApiAction() {
+			@Override
+			public Object apply(JSONObject args) {
+				boolean visible = args.get("visible").isBoolean().booleanValue();
+				menuBar.setVisible(visible);
+
+				return null;
+			}
+		});
+	}
+
+	boolean shown = false;
     
     public void composeMainMenu(MenuBar mainMenuBar) {
     	mainMenuBar.addItem(getClassCheckItem("Add Wire", "WireElm"));
