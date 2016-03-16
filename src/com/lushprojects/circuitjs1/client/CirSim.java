@@ -63,7 +63,6 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -76,7 +75,7 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import static com.google.gwt.event.dom.client.KeyCodes.*;
 import static com.lushprojects.circuitjs1.client.api.ActionType.*;
 import static com.lushprojects.circuitjs1.client.api.ActionType.EXPORT_AS_TEXT;
-import static com.lushprojects.circuitjs1.client.api.ActionType.SET_DISPLAY_VISIBILITY;
+import static com.lushprojects.circuitjs1.client.api.ActionType.SET_FILE_MENU_ITEM_VISIBILITY;
 
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Window.Location;
@@ -314,7 +313,6 @@ MouseOutHandler, MouseWheelHandler {
 //    String baseURL = "http://www.falstad.com/circuit/";
     
     public void init() {
-		initializeApi();
 
 //	String euroResistor = null;
 //	String useFrameStr = null;
@@ -421,8 +419,8 @@ MouseOutHandler, MouseWheelHandler {
 //	  fileMenuBar.addItem("Exit", cmd);
 	  
 	  menuBar = new MenuBar();
-	  menuBar.addItem("File", fileMenuBar);
-	  verticalPanel=new VerticalPanel();
+        final MenuItem fileMenuItem = menuBar.addItem("File", fileMenuBar);
+        verticalPanel=new VerticalPanel();
 	  
 
 	  
@@ -713,11 +711,11 @@ MouseOutHandler, MouseWheelHandler {
 	    // setup timer
 
 	    timer.scheduleRepeating(FASTTIMER);
-	  
 
+        initializeApi(fileMenuItem);
     }
 
-	private void initializeApi() {
+	private void initializeApi(final MenuItem fileMenuItem) {
 		final ApiProvider apiProvider = new ApiProvider();
 
 		apiProvider.addAction(EXPORT_AS_TEXT, new ApiAction() {
@@ -737,11 +735,11 @@ MouseOutHandler, MouseWheelHandler {
 			}
 		});
 
-		apiProvider.addAction(SET_DISPLAY_VISIBILITY, new ApiAction() {
+		apiProvider.addAction(SET_FILE_MENU_ITEM_VISIBILITY, new ApiAction() {
 			@Override
 			public Object apply(JSONObject args) {
 				boolean visible = args.get("visible").isBoolean().booleanValue();
-				menuBar.setVisible(visible);
+                fileMenuItem.setVisible(visible);
 
 				return null;
 			}
