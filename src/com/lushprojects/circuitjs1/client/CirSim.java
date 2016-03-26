@@ -705,17 +705,25 @@ MouseOutHandler, MouseWheelHandler {
 		    public void onClick(ClickEvent event) {
 		        doMainMenuChecks();
 		      }
-		    }, ClickEvent.getType());	
+		    }, ClickEvent.getType());
 		Event.addNativePreviewHandler(this);
 		cv.addMouseWheelHandler(this);
 	    // setup timer
 
 	    timer.scheduleRepeating(FASTTIMER);
 
+        processUrlParams(fileMenuItem);
         initializeApi(fileMenuItem);
     }
 
-	private void initializeApi(final MenuItem fileMenuItem) {
+    private void processUrlParams(final MenuItem fileMenuItem) {
+        QueryParameters qp = new QueryParameters();
+
+        Boolean hideFileMenu = qp.getBooleanValue("hideFileMenu", false);
+        fileMenuItem.setVisible(!hideFileMenu);
+    }
+
+    private void initializeApi(final MenuItem fileMenuItem) {
 		final ApiProvider apiProvider = new ApiProvider();
 
 		apiProvider.addAction(EXPORT_AS_TEXT, new ApiAction() {
